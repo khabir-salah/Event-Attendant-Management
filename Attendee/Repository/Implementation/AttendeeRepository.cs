@@ -1,6 +1,8 @@
 ﻿using Attendee.Context;
 using Attendee.Entities;
 using Attendee.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Attendee.Repository.Implementation
 {
@@ -12,22 +14,23 @@ namespace Attendee.Repository.Implementation
         {
             _context = context;
         }
-        public int Add(Attendant attandant)
+
+        public async Task< int> Add(Attendant attandant)
         {
-           _context.Add( attandant );
-            return _context.SaveChanges();
+           _context.attendees.AddAsync( attandant );
+            return await _context.SaveChangesAsync();
         }
 
-        public ICollection<Attendant> GetAll()
+        public async Task<ICollection<Attendant>> GetAll()
         {
-            return _context.attendees.ToList();
+            return await _context.attendees.ToListAsync();
         }
 
-        public Attendant? GetAttendantByName(string name)
+        public async Task<Attendant?> GetAttendant(Expression<Func<Attendant, bool>> predicate)
         {
-           var attendee = _context.attendees.SingleOrDefault(a => a.FirstName == name);
-            return attendee;
+            return await _context.attendees.FindAsync(predicate);
         }
+
 
         public Attendant UpdateAttendance(Attendant attendee)
         {

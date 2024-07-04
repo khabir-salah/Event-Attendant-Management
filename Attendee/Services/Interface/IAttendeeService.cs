@@ -5,16 +5,17 @@ namespace Attendee.Services.Interface
 {
     public interface IAttendeeService
     {
-        AttendeeDTO Register(AttendeeRequestModel attendant);
-        bool IsSteppedOut(string attendant);
-        public bool IsCheckedOut(string name);
+        Task<AttendeeDTO> Register(AttendeeRequestModel attendant);
+        Task<bool> IsSteppedOut(string attendant);
+        Task<bool> IsCheckedOut(string name);
+        Task<bool> StepOutOnce(string name);
+        Task<AttendeeDTO> GetAttendee(string name);
 
-        bool StepOutOnce(string name);
-
-
-
-
-        AttendeeDTO GetAttendee(string name);
+        Task<ICollection<AttendeeDTO>> AttendeeDetails();
+        Task<ICollection<AttendeeDTO>> TempStepOutAttendee();
+        Task<ICollection<AttendeeDTO>> DeniedStepOut();
+        Task<ICollection<AttendeeDTO>> AttendeePresent();
+        Task<ICollection<AttendeeDTO>> SuccessfullStepOut();
 
     }
 }

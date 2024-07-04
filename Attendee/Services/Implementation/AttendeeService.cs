@@ -20,9 +20,9 @@ namespace Attendee.Services.Implementation
         //   allattendee.select()
         //}
 
-        public AttendeeDTO GetAttendee(string name)
+        public async Task<AttendeeDTO> GetAttendee(string name)
         {
-            var get = _attendeeRepository.GetAttendantByName(name);
+            var get = await _attendeeRepository.GetAttendant(a => a.FirstName.Contains(name) || a.LastName.Contains(name));
             if(get != null)
             {
                 var attendee = new Attendant
@@ -50,9 +50,9 @@ namespace Attendee.Services.Implementation
             
         }
 
-        public bool IsCheckedOut(string name)
+        public async Task<bool> IsCheckedOut(string name)
         {
-            var checkName = _attendeeRepository.GetAttendantByName(name);
+            var checkName = await  _attendeeRepository.GetAttendant(a => a.FirstName.Contains(name) || a.LastName.Contains(name));
             if(checkName.DepartureTime >= DateTime.Now)
             {
                 return true;
@@ -62,9 +62,9 @@ namespace Attendee.Services.Implementation
 
         
 
-        public bool IsSteppedOut(string name)
+        public async Task<bool> IsSteppedOut(string name)
         {
-           var checkName = _attendeeRepository.GetAttendantByName(name);
+           var checkName = await _attendeeRepository.GetAttendant(a => a.FirstName.Contains(name) || a.LastName.Contains(name));
             if(checkName.ArrivalTime >= DateTime.MaxValue.AddMinutes(30))
             {
                 return true;
@@ -72,9 +72,9 @@ namespace Attendee.Services.Implementation
             return false;
         }
 
-        public bool StepOutOnce(string name) 
+        public async Task<bool> StepOutOnce(string name) 
         {
-            var check = _attendeeRepository.GetAttendantByName(name);
+            var check = await _attendeeRepository.GetAttendant(a => a.FirstName.Contains(name) || a.LastName.Contains(name));
             if(check.IsSteppedOut == Status.Returned)
             {
                 return true;
@@ -84,9 +84,9 @@ namespace Attendee.Services.Implementation
 
         
 
-        public AttendeeDTO Register(AttendeeRequestModel attendant)
+        public async Task<AttendeeDTO> Register(AttendeeRequestModel attendant)
         {
-            var isExit = GetAttendee(attendant.FirstName);
+            var isExit = await GetAttendee(attendant.FirstName);
             if(isExit == null)
             {
                 var attendee = new Attendant
@@ -107,15 +107,104 @@ namespace Attendee.Services.Implementation
                     Age = attendee.Age,
                     ArrivalTime = DateTime.Now,
                     DepartureTime = Event.EventEndTime,
-                    IsCheckedOut= IsCheckedOut(attendee.FirstName),
+                    IsCheckedOut = false,
                     IsSteppedOut = Status.Inside
                 };
             }
             return null;
         }
 
-       
 
-       
+        public async Task<ICollection<AttendeeDTO>> AttendeeDetails()
+        {
+            var allAttendee = await _attendeeRepository.GetAll();
+            var attendeeList = allAttendee.Select(x => new AttendeeDTO
+            {
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                Age = x.Age,
+                ArrivalTime = x.ArrivalTime,
+                DepartureTime = x.DepartureTime,
+                IsCheckedOut = x.IsCheckedOut,
+                IsSteppedOut = x.IsSteppedOut
+            }).ToList();
+            return attendeeList;
+        }
+
+        public async Task<ICollection<AttendeeDTO>> AttendeePresent()
+        {
+            var attendeeList = new List<AttendeeDTO>();
+            var attendee = await _attendeeRepository.GetAll();
+            var asd = attendee.Where(x => x.IsSteppedOut == Entities.Status.Returned && x.IsSteppedOut == Entities.Status.Inside);
+            foreach (var item in asd)
+            {
+                var attendant = new AttendeeDTO
+                {
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    Age = item.Age,
+                    ArrivalTime = item.ArrivalTime,
+                    DepartureTime = item.DepartureTime,
+                    IsCheckedOut = item.IsCheckedOut,
+                    IsSteppedOut = item.IsSteppedOut,
+                };
+                attendeeList.Add(attendant);
+            }
+            return attendeeList;
+        }
+
+        public Task<ICollection<AttendeeDTO>> DeniedStepOut()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        public async Task<ICollection<AttendeeDTO>> SuccessfullStepOut()
+        {
+            var attendeeList = new List<AttendeeDTO>();
+            var attendee = await _attendeeRepository.GetAll();
+            var asd = attendee.Where(x => x.IsSteppedOut == Entities.Status.Outside && x.IsSteppedOut == Entities.Status.Returned);
+            foreach (var item in asd)
+            {
+                var attendant = new AttendeeDTO
+                {
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    Age = item.Age,
+                    ArrivalTime = item.ArrivalTime,
+                    DepartureTime = item.DepartureTime,
+                    IsCheckedOut = item.IsCheckedOut,
+                    IsSteppedOut = item.IsSteppedOut,
+                };
+                attendeeList.Add(attendant);
+            }
+            return attendeeList;
+        }
+
+        public async Task<ICollection<AttendeeDTO>> TempStepOutAttendee()
+        {
+            var attendeeList = new List<AttendeeDTO>();
+            var attendee = await _attendeeRepository.GetAll();
+            var asd = attendee.Where(x => x.IsSteppedOut == Entities.Status.Outside);
+            foreach (var item in asd)
+            {
+                var attendant = new AttendeeDTO
+                {
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    Age = item.Age,
+                    ArrivalTime = item.ArrivalTime,
+                    DepartureTime = item.DepartureTime,
+                    IsCheckedOut = item.IsCheckedOut,
+                    IsSteppedOut = item.IsSteppedOut
+                };
+                attendeeList.Add(attendant);
+            }
+            return attendeeList;
+        }
+
+
+
     }
 }

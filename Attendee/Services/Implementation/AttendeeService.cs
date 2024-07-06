@@ -2,6 +2,7 @@
 using Attendee.Entities;
 using Attendee.Repository.Interface;
 using Attendee.Services.Interface;
+using System.Linq;
 
 namespace Attendee.Services.Implementation
 {
@@ -95,7 +96,6 @@ namespace Attendee.Services.Implementation
                     LastName = attendant.LastName,
                     Age = attendant.Age,
                     ArrivalTime = DateTime.Now,
-                    DepartureTime = Event.EventEndTime,
                     IsCheckedOut = false,
                     IsSteppedOut = Status.Inside,
                 };
@@ -106,7 +106,6 @@ namespace Attendee.Services.Implementation
                     LastName = attendee.LastName,
                     Age = attendee.Age,
                     ArrivalTime = DateTime.Now,
-                    DepartureTime = Event.EventEndTime,
                     IsCheckedOut = false,
                     IsSteppedOut = Status.Inside
                 };
@@ -204,7 +203,70 @@ namespace Attendee.Services.Implementation
             return attendeeList;
         }
 
+        public async Task<EventResponseModel> RegisterEvent(EventRequestModel requestModel)
+        {
 
+            var checkTime = await _attendeeRepository.GetEvent(e => requestModel.EventStartTime < e.EventEndTime && requestModel.EventEndTime > e.EventStartTime);
+            if(checkTime == null)
+            {
+                var newEvent = new Event
+                {
+                    name = requestModel.name,
+                    Description = requestModel.Description,
+                    EventStartTime = requestModel.EventStartTime,
+                    EventEndTime = requestModel.EventEndTime,
+                };
+                _attendeeRepository.AddEvent(newEvent);
+                return new EventResponseModel
+                {
+                    name = newEvent.name,
+                    Description = newEvent.Description,
+                    EventStartTime = newEvent.EventStartTime,
+                    EventEndTime = newEvent.EventEndTime,
+                };
+            }
+            return null;
+        }
 
+        public EventResponseModel UpdateEvent(EventRequestModel requestModel)
+        {
+            var isEventExist = _attendeeRepository.GetEvent(e => e.Id == requestModel.Id);
+            if(isEventExist != null)
+            {
+                return new EventResponseModel
+                {
+                    name = requestModel.name,
+                    Description = requestModel.Description,
+                    EventStartTime = requestModel.EventStartTime,
+                    EventEndTime = requestModel.EventEndTime,
+                };
+            }
+            return null;
+        }
+
+        public async Task<ICollection<EventResponseModel>> GetAllEvent()
+        {
+            var allEvent = _attendeeRepository.GetAllEvents();
+            var data = ( await allEvent).Select(s => new EventResponseModel
+            {
+                name = s.name,
+                Description = s.Description,
+                EventEndTime = s.EventEndTime,
+                EventStartTime = s.EventStartTime,
+            }).ToList();
+            return data;
+        }
+
+        public async Task<AttendeeDTO> SignOutAttendee(int Id)
+        {
+            var attendee = await _attendeeRepository.GetAttendant(a => a.Id == Id);
+            if(attendee != null)
+            {
+                attendee.DepartureTime = DateTime.UtcNow;
+                _attendeeRepository.UpdateAttendance(attendee);
+            }
+            return null;
+            
+        }
     }
 }

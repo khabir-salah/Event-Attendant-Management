@@ -15,10 +15,14 @@ namespace Attendee.Repository.Implementation
             _context = context;
         }
 
-        public async Task< int> Add(Attendant attandant)
+        public void Add(Attendant attandant)
         {
            _context.attendees.AddAsync( attandant );
-            return await _context.SaveChangesAsync();
+        }
+
+        public void AddEvent(Event @event)
+        {
+            _context.Events.AddAsync(@event);
         }
 
         public async Task<ICollection<Attendant>> GetAll()
@@ -26,11 +30,30 @@ namespace Attendee.Repository.Implementation
             return await _context.attendees.ToListAsync();
         }
 
+        public async Task<ICollection<Event>> GetAllEvents()
+        {
+            return await _context.Events.ToListAsync();
+        }
+
         public async Task<Attendant?> GetAttendant(Expression<Func<Attendant, bool>> predicate)
         {
             return await _context.attendees.FindAsync(predicate);
         }
 
+        public async Task<Event?> GetEvent(Func<Event, bool> predicate)
+        {
+            return await _context.Events.FindAsync(predicate);
+        }
+
+        public void RemoveAttendance(Attendant attendee)
+        {
+            _context.attendees.Remove(attendee);
+        }
+
+        public void RemoveEvent(Event @event)
+        {
+             _context.Events.Remove(@event);
+        }
 
         public Attendant UpdateAttendance(Attendant attendee)
         {
@@ -38,6 +61,10 @@ namespace Attendee.Repository.Implementation
             return attendee;
         }
 
-        
+        public Event UpdateEvent(Event @event)
+        {
+            _context.Events.Update(@event);
+            return @event;
+        }
     }
 }

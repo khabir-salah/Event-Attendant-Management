@@ -16,8 +16,11 @@ namespace Attendee.Entities
 
     public class Event
     {
-        public static DateTime EventStartTime { get;  } = DateTime.Now;
-        public static DateTime EventEndTime { get; } =  DateTime.Now.AddHours(1);
+        public int Id { get; set; }
+        public string name { get; set; } = default!;
+        public string Description { get; set; } = default!;
+        public  DateTime EventStartTime { get; set; } = default!;
+        public  DateTime EventEndTime { get; set; } = default!;
     }
 
     public enum Status

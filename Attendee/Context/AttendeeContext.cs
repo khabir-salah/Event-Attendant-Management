@@ -12,6 +12,7 @@ namespace Attendee.Context
 
 
         public DbSet<Attendant>  attendees { get; set; }
+        public DbSet<Event> Events { get; set; }
     }
 
     

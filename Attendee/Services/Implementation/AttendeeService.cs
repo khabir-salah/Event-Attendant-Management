@@ -9,9 +9,11 @@ namespace Attendee.Services.Implementation
     public class AttendeeService : IAttendeeService
     {
         private readonly IAttendeeRepository _attendeeRepository;
-        public AttendeeService(  IAttendeeRepository attendeeRepository ) 
+        private readonly IUnitOfWork _unitOfWork;
+        public AttendeeService(  IAttendeeRepository attendeeRepository, IUnitOfWork unitOfWork) 
         {
             _attendeeRepository = attendeeRepository;
+            _unitOfWork = unitOfWork;
         }
 
         
@@ -100,6 +102,7 @@ namespace Attendee.Services.Implementation
                     IsSteppedOut = Status.Inside,
                 };
                 _attendeeRepository.Add(attendee);
+                _unitOfWork.SaveChanges();
                 return new AttendeeDTO
                 {
                     FirstName = attendee.FirstName,
@@ -217,6 +220,7 @@ namespace Attendee.Services.Implementation
                     EventEndTime = requestModel.EventEndTime,
                 };
                 _attendeeRepository.AddEvent(newEvent);
+                _unitOfWork.SaveChanges();
                 return new EventResponseModel
                 {
                     name = newEvent.name,
@@ -233,13 +237,14 @@ namespace Attendee.Services.Implementation
             var isEventExist = _attendeeRepository.GetEvent(e => e.Id == requestModel.Id);
             if(isEventExist != null)
             {
-                return new EventResponseModel
+                var updatedEvent = new EventResponseModel
                 {
                     name = requestModel.name,
                     Description = requestModel.Description,
                     EventStartTime = requestModel.EventStartTime,
                     EventEndTime = requestModel.EventEndTime,
                 };
+                _attendeeRepository.UpdateEvent(isEventExist); return updatedEvent;
             }
             return null;
         }

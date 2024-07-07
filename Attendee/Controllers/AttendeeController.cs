@@ -20,7 +20,7 @@ namespace Attendee.Controllers
             {
                 TempData["Successfull"] = "Registration Successfull";
             }
-            return RedirectToAction("GetAttendee");
+            return RedirectToAction("Register");
         }
 
         [HttpGet]

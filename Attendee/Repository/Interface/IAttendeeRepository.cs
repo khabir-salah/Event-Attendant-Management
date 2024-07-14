@@ -16,7 +16,9 @@ namespace Attendee.Repository.Interface
         Task<ICollection<Event>> GetAllEvents();
         Task<Event> GetEvents(Func<Event, bool> predicate);
         Event GetEvent(int id);
-
-
+        void AddUser(User user);
+        Task<ICollection<User>> GetAllUsers();
+        Task<User> GetUser(Func<User, bool> predicate);
+        Task<Role> GetRole(Func<Role, bool> predicate);
     }
 }

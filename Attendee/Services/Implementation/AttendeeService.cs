@@ -2,6 +2,7 @@
 using Attendee.Entities;
 using Attendee.Repository.Interface;
 using Attendee.Services.Interface;
+using BCrypt.Net;
 using System.Linq;
 
 namespace Attendee.Services.Implementation
@@ -272,6 +273,61 @@ namespace Attendee.Services.Implementation
             }
             return null;
             
+        }
+
+        public async Task<RegisterResponseModel> RegisterUser(RegisterRequestModel request)
+        {
+            var isUserExist = await IsEmailExist(request.Email);
+            if(isUserExist)
+            {
+                var userRole = await _attendeeRepository.GetRole(r => r.Name == "Attendee");
+                var hashPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                var user = new User
+                {
+                    Email = request.Email,
+                    Password = request.Password,
+                    UserName = request.UserName,
+                    RoleId = userRole.Id,
+                };
+                _attendeeRepository.AddUser(user);
+                _unitOfWork.SaveChanges();
+                return new RegisterResponseModel
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Password = user.Password,
+                    Role = userRole.Name,
+                };
+            }
+            return null;
+        }
+
+        public async Task<LoginResponseModel> Login(LoginRequestModel request)
+        {
+            var checkUser = await _attendeeRepository.GetUser(u => u.Email == request.Email);
+            if(checkUser != null)
+            {
+                var checkPassword = BCrypt.Net.BCrypt.Verify(checkUser.Password, request.Password);
+                if(checkPassword)
+                {
+                    return new LoginResponseModel
+                    {
+                        Email = checkUser.Email,
+                        Password = checkUser.Password,
+                        RoleId = checkUser.RoleId,
+                        UserName = checkUser.UserName,
+                        id = checkUser.Id
+                    };
+                }
+                return null;
+            }
+            return null;
+        }
+
+        private async Task<bool> IsEmailExist(string email)
+        {
+            var users = await _attendeeRepository.GetAllUsers();
+            return users.Any(u => u.Email == email);
         }
     }
 }

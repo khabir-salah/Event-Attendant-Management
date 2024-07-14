@@ -20,6 +20,8 @@ namespace Attendee.Services.Interface
         Task<EventResponseModel> RegisterEvent(EventRequestModel requestModel);
         EventResponseModel UpdateEvent(EventRequestModel requestModel);
         Task<ICollection<EventResponseModel>> GetAllEvent();
+        Task<RegisterResponseModel> RegisterUser(RegisterRequestModel request);
+        Task<LoginResponseModel> Login(LoginRequestModel request);
 
 
     }

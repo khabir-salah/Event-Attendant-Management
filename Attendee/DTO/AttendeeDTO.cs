@@ -45,4 +45,35 @@ namespace Attendee.DTO
         public  DateTime EventStartTime { get; set; } = default!;
         public  DateTime EventEndTime { get; set; } = default!;
     }
+
+    public class RegisterRequestModel
+    {
+        public string UserName { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string Email { get; set; } = null!;
+    }
+
+    public class RegisterResponseModel
+    {
+        public int id { get; set; }
+        public string Role { get; set; }
+        public string UserName { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string Email { get; set; } = null!;
+    }
+
+    public class LoginRequestModel
+    {
+        public string Password { get; set; } = null!;
+        public string Email { get; set; } = null!;
+    }
+
+    public class LoginResponseModel
+    {
+        public string Password { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public int id { get; set; }
+        public int RoleId { get; set; } 
+        public string UserName { get; set; } = null!;
+    }
 }

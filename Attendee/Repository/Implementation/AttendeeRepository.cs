@@ -71,5 +71,25 @@ namespace Attendee.Repository.Implementation
             _context.Events.Update(@event);
             return @event;
         }
+
+        public void AddUser(User user)
+        {
+            _context.Users.Add(user);
+        }
+
+        public async Task<ICollection<User>> GetAllUsers()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
+        public async Task<User?> GetUser(Func<User, bool> predicate)
+        {
+            return await _context.Users.FindAsync(predicate);
+        }
+
+        public async Task<Role> GetRole(Func<Role, bool> predicate)
+        {
+            return await _context.Roles.FindAsync(predicate);
+        }
     }
 }

@@ -32,15 +32,19 @@ namespace Attendee.Entities
     public class User
     {
         public int Id { get; set; }
+        public string UserName { get; set; }
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
-        public string Role { get; set; } = null!;
+        public Role Role { get; set; } = null!;
+        public int RoleId { get; set; }
+
     }
 
     public class Role
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
+        public User User { get; set; }
     }
 
    

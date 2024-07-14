@@ -40,9 +40,14 @@ namespace Attendee.Repository.Implementation
             return await _context.attendees.FindAsync(predicate);
         }
 
-        public async Task<Event?> GetEvent(Func<Event, bool> predicate)
+        public async Task<Event?> GetEvents(Func<Event, bool> predicate)
         {
             return await _context.Events.FindAsync(predicate);
+        }
+
+        public Event? GetEvent(int id)
+        {
+            return _context.Events.Find(id);
         }
 
         public void RemoveAttendance(Attendant attendee)

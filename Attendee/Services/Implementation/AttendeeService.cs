@@ -209,7 +209,7 @@ namespace Attendee.Services.Implementation
         public async Task<EventResponseModel> RegisterEvent(EventRequestModel requestModel)
         {
 
-            var checkTime = await _attendeeRepository.GetEvent(e => requestModel.EventStartTime < e.EventEndTime && requestModel.EventEndTime > e.EventStartTime);
+            var checkTime = await _attendeeRepository.GetEvents(e => requestModel.EventStartTime < e.EventEndTime && requestModel.EventEndTime > e.EventStartTime);
             if(checkTime == null)
             {
                 var newEvent = new Event
@@ -234,7 +234,7 @@ namespace Attendee.Services.Implementation
 
         public EventResponseModel UpdateEvent(EventRequestModel requestModel)
         {
-            var isEventExist = _attendeeRepository.GetEvent(e => e.Id == requestModel.Id);
+            var isEventExist = _attendeeRepository.GetEvent(requestModel.Id);
             if(isEventExist != null)
             {
                 var updatedEvent = new EventResponseModel

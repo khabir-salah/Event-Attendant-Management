@@ -14,7 +14,8 @@ namespace Attendee.Repository.Interface
         void AddEvent(Event @event);
         void RemoveEvent(Event @event);
         Task<ICollection<Event>> GetAllEvents();
-        Task<Event> GetEvent(Func<Event, bool> predicate);
+        Task<Event> GetEvents(Func<Event, bool> predicate);
+        Event GetEvent(int id);
 
 
     }

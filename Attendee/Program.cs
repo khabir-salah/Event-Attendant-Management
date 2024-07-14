@@ -3,7 +3,11 @@ using Attendee.Repository.Implementation;
 using Attendee.Repository.Interface;
 using Attendee.Services.Implementation;
 using Attendee.Services.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Attendee
 {
@@ -19,15 +23,22 @@ namespace Attendee
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IAttendeeRepository, AttendeeRepository>();
             builder.Services.AddScoped<IAttendeeService, AttendeeService>();
-            
 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+            });
             builder.Services.AddDbContext<AttendeeContext>(
-    options => options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString)
-
-    )
-);
+            options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 
             var app = builder.Build();

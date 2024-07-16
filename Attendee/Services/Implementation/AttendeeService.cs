@@ -329,5 +329,10 @@ namespace Attendee.Services.Implementation
             var users = await _attendeeRepository.GetAllUsers();
             return users.Any(u => u.Email == email);
         }
+        private async Task<bool> IsEmailExists(string email)
+        {
+            var users = await _attendeeRepository.GetAllUsers();
+            return users.Any(u => u.Email == email);
+        }
     }
 }
